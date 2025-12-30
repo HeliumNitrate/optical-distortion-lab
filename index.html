@@ -346,6 +346,53 @@ footer {
     forward model — not the other way around.
   </p>
 </section>
+<!-- WHY NOT OPENCV -->
+<section>
+  <h2>Why Not OpenCV or Standard Calibration Tools?</h2>
+
+  <p style="max-width:800px;">
+    OpenCV and similar libraries are excellent for
+    <strong>parameter estimation and camera calibration</strong>.
+    However, they are fundamentally designed around
+    <em>inverse correction</em>, not forward distortion modeling.
+  </p>
+
+  <div class="features">
+    <div class="feature">
+      <h3>Fixed Low-Order Models</h3>
+      <p>
+        Most calibration tools rely on predefined,
+        low-order distortion models that implicitly assume
+        smooth and monotonic behavior.
+      </p>
+    </div>
+
+    <div class="feature">
+      <h3>No Physical Validity Check</h3>
+      <p>
+        Non-monotonic mappings, folding, and information loss
+        are usually not detected or reported explicitly.
+      </p>
+    </div>
+
+    <div class="feature">
+      <h3>Inverse-Only Perspective</h3>
+      <p>
+        The forward distortion function is rarely treated
+        as a first-class, inspectable object.
+      </p>
+    </div>
+  </div>
+
+  <p style="margin-top:32px; max-width:800px;">
+    Optical Distortion Lab addresses these limitations by
+    treating <strong>forward distortion as the primary problem</strong>,
+    enforcing physical constraints, and allowing
+    unrestricted model complexity when required.
+  </p>
+</section>
+
+
 <!-- FUTURE WORKS -->
 <section>
   <h2>Roadmap & Future Work</h2>
@@ -374,6 +421,51 @@ footer {
         methods for advanced optical systems.
       </p>
     </div>
+  </div>
+</section>
+
+<!-- LICENSING -->
+<section>
+  <h2>Licensing & Availability</h2>
+
+  <p style="max-width:800px;">
+    Optical Distortion Lab is distributed as a
+    <strong>commercial MATLAB toolbox</strong>,
+    intended for research, development, and industrial use.
+  </p>
+
+  <div class="features">
+    <div class="feature">
+      <h3>Research & Academic License</h3>
+      <p>
+        Suitable for universities, research groups,
+        and individual researchers.
+      </p>
+    </div>
+
+    <div class="feature">
+      <h3>Commercial License</h3>
+      <p>
+        For industrial applications, product development,
+        and internal tooling.
+      </p>
+    </div>
+
+    <div class="feature">
+      <h3>Evaluation Access</h3>
+      <p>
+        Limited evaluation versions may be provided
+        upon request.
+      </p>
+    </div>
+  </div>
+
+  <div style="margin-top:40px;">
+    <a href="mailto:ahmet.basaran@opticaldistortionlab.com"
+       class="btn-primary"
+       style="display:inline-block; padding:16px 36px; border-radius:32px;">
+      Request Licensing Information
+    </a>
   </div>
 </section>
 
@@ -429,4 +521,5 @@ footer {
 
 </body>
 </html>
+
 
