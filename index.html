@@ -3,11 +3,7 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-
 <title>Optical Distortion Lab</title>
-
-<meta name="description"
-content="Optical Distortion Lab provides a forward-first MATLAB distortion engine for modeling, validating and inverting optical distortion with physically constrained polynomial models.">
 
 <style>
 * {
@@ -155,7 +151,6 @@ nav a { margin-left: 24px; font-size: 0.95rem; }
   border-radius: 20px;
   letter-spacing: 0.05em;
   font-weight: 500;
-  backdrop-filter: blur(6px);
 }
 
 .badge.mono {
@@ -197,30 +192,85 @@ footer {
 <h1>Optical Distortion & Undistortion Toolbox</h1>
 
 <p>
-A commercial <strong>MATLAB distortion engine</strong> designed for
-forward distortion modeling, physical validity control,
+A commercial <strong>MATLAB distortion engine</strong> designed for<br>
+forward distortion modeling, physical validity control,<br>
 and safe inverse undistortion.
 </p>
 
 <div class="buttons">
+<a href="#toolbox" class="btn-primary">Explore Toolbox</a>
+<a href="distortion-explorer.html" class="btn-secondary">Distortion Function Explorer</a>
+</div>
 
-<a href="#toolbox" class="btn-primary">
-Explore Toolbox
-</a>
+</section>
 
-<a href="distortion-explorer.html" class="btn-secondary">
-Distortion Function Explorer
-</a>
+<section id="toolbox">
 
-<a href="#contact" class="btn-secondary">
-Contact
-</a>
+<h2>Distortion & Undistortion Toolbox (MATLAB)</h2>
+
+<p>
+A flexible and high-accuracy framework for modeling,
+applying and inverting optical distortion.
+</p>
+
+<p style="margin-top:24px;">
+Unlike conventional calibration libraries,
+Optical Distortion Lab is built around a
+<strong>forward-first distortion philosophy</strong>.
+</p>
+
+<div class="features">
+
+<div class="feature">
+<h3>Unlimited Polynomial Models</h3>
+<p>No predefined limit on polynomial degree or number of terms.</p>
+</div>
+
+<div class="feature">
+<h3>Monotonicity & Physical Validity</h3>
+<p>Automatic detection of non-monotonic mappings and folding.</p>
+</div>
+
+<div class="feature">
+<h3>Robust Inverse Mapping</h3>
+<p>LUT-based inverse mapping with stable interpolation.</p>
+</div>
+
+<div class="feature">
+<h3>Production Ready</h3>
+<p>Script-based batch processing distributed as MATLAB toolbox.</p>
+</div>
 
 </div>
 
 </section>
 
-<!-- SAYFANIN KALANI AYNEN DEVAM EDİYOR -->
+<section id="contact">
+
+<h2>Contact</h2>
+
+<p>
+📧
+<a href="mailto:ahmet.basaran@opticaldistortionlab.com">
+ahmet.basaran@opticaldistortionlab.com
+</a>
+</p>
+
+<p style="margin-top:10px;">
+ORCID:
+<a href="https://orcid.org/0009-0008-2682-0572">
+0009-0008-2682-0572
+</a>
+</p>
+
+<p style="margin-top:10px;">
+GitHub:
+<a href="https://github.com/HeliumNitrate">
+HeliumNitrate
+</a>
+</p>
+
+</section>
 
 <footer>
 © 2025 OpticalDistortionLab
