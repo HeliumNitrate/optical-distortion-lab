@@ -98,7 +98,7 @@ gap:10px 36px;
 
 .control-row{
 display:grid;
-grid-template-columns:58px 1fr 82px;
+grid-template-columns:58px 1fr 46px 82px;
 align-items:center;
 gap:10px;
 }
@@ -273,8 +273,14 @@ select.appendChild(opt);
 
 select.value=i+2;
 
+/* value display */
+const valSpan=document.createElement("span");
+valSpan.style.cssText="font-size:0.82rem;color:#aaa;min-width:40px;text-align:right;display:inline-block;";
+valSpan.textContent="0.00";
+
 row.appendChild(label);
 row.appendChild(slider);
+row.appendChild(valSpan);
 row.appendChild(select);
 
 controlsDiv.appendChild(row);
@@ -282,8 +288,8 @@ controlsDiv.appendChild(row);
 sliders.push(slider);
 powers.push(select);
 
-slider.addEventListener("input",scheduleRender);
-slider.addEventListener("change",updateAll);
+slider.addEventListener("input",()=>{valSpan.textContent=parseFloat(slider.value).toFixed(2);scheduleRender();});
+slider.addEventListener("change",()=>{valSpan.textContent=parseFloat(slider.value).toFixed(2);updateAll();});
 select.addEventListener("change",updateAll);
 
 }
@@ -474,11 +480,52 @@ imgCtx.putImageData(out, 0, 0);
 
 }
 
+/* EQUATION + WARNING */
+
+function updateEquation(){
+
+  /* build equation string */
+  let eq = "f(r) = r";
+  let hasTerms = false;
+
+  for(let i=0;i<TERM_COUNT;i++){
+    const c = parseFloat(sliders[i].value);
+    const p = parseInt(powers[i].value);
+    if(Math.abs(c) < 0.001) continue;
+    const sign = c >= 0 ? " + " : " − ";
+    eq += sign + Math.abs(c).toFixed(2) + "·r^" + p;
+    hasTerms = true;
+  }
+
+  equationDiv.textContent = eq;
+
+  /* monotonicity check */
+  const N = 400;
+  let isMonotonic = true;
+  let prevRd = 0;
+  for(let i=1;i<=N;i++){
+    const r = (i/N)*1.5;
+    const rd = f(r);
+    if(rd < prevRd){ isMonotonic=false; break; }
+    prevRd = rd;
+  }
+
+  if(!isMonotonic){
+    warningDiv.style.color="#ff6b6b";
+    warningDiv.textContent="⚠ Non-monotonic — folding detected";
+  } else {
+    warningDiv.style.color="#5cffb0";
+    warningDiv.textContent = hasTerms ? "✓ Monotonic" : "";
+  }
+
+}
+
 /* UPDATE */
 
 function updateAll(){
 
 drawGraph();
+updateEquation();
 forwardRender();
 
 }
@@ -486,6 +533,7 @@ forwardRender();
 function scheduleRender(){
 
 drawGraph();
+updateEquation();
 clearTimeout(redrawTimer);
 redrawTimer=setTimeout(forwardRender,90);
 
@@ -499,6 +547,13 @@ for(let i=0;i<TERM_COUNT;i++){
 
 sliders[i].value=0;
 powers[i].value=i+2;
+
+/* reset value displays */
+const rows=controlsDiv.querySelectorAll(".control-row");
+if(rows[i]){
+  const span=rows[i].querySelector("span");
+  if(span) span.textContent="0.00";
+}
 
 }
 
