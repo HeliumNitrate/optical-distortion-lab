@@ -1,0 +1,722 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Distortion Function Explorer</title>
+
+<style>
+
+body{
+background:#111;
+color:#eee;
+font-family:Arial, Helvetica, sans-serif;
+text-align:center;
+margin:20px;
+}
+
+h2{
+margin-bottom:8px;
+}
+
+.topbar{
+margin-bottom:18px;
+}
+
+.uploadLabel{
+display:inline-block;
+padding:8px 16px;
+border:1px solid #555;
+background:#222;
+cursor:pointer;
+}
+
+.uploadLabel input{
+display:none;
+}
+
+.main-row{
+display:flex;
+justify-content:center;
+align-items:flex-start;
+gap:36px;
+flex-wrap:wrap;
+margin-top:12px;
+}
+
+.panel{
+display:flex;
+flex-direction:column;
+align-items:center;
+}
+
+canvas{
+border:1px solid #444;
+background:#000;
+}
+
+#imageCanvas{
+max-width:100%;
+height:auto;
+}
+
+#graphCanvas{
+max-width:100%;
+height:auto;
+}
+
+.controls-wrap{
+margin-top:26px;
+display:flex;
+justify-content:center;
+}
+
+#controls{
+display:grid;
+grid-template-columns:repeat(2, minmax(320px, 360px));
+gap:10px 36px;
+justify-content:center;
+}
+
+.control-row{
+display:grid;
+grid-template-columns:58px 1fr 82px;
+align-items:center;
+gap:10px;
+}
+
+.control-row input[type="range"]{
+width:100%;
+}
+
+select{
+padding:4px;
+background:#222;
+color:#eee;
+border:1px solid #555;
+}
+
+.warning{
+margin-top:8px;
+font-size:18px;
+min-height:24px;
+font-weight:bold;
+}
+
+.note{
+margin-top:8px;
+font-size:13px;
+color:#aaa;
+max-width:460px;
+line-height:1.4;
+}
+
+.equation{
+margin-top:12px;
+font-size:18px;
+color:cyan;
+min-height:28px;
+max-width:460px;
+line-height:1.4;
+}
+
+.buttons{
+display:flex;
+justify-content:center;
+gap:12px;
+margin-top:16px;
+flex-wrap:wrap;
+}
+
+button{
+padding:8px 16px;
+cursor:pointer;
+border:1px solid #555;
+background:#222;
+color:#eee;
+}
+
+label{
+margin-top:10px;
+user-select:none;
+}
+
+
+</style>
+</head>
+<body>
+
+<h2>Distortion Function Explorer</h2>
+
+<div class="topbar">
+<label class="uploadLabel">
+Choose Image
+<input type="file" id="upload" accept="image/*">
+</label>
+</div>
+
+<div class="main-row">
+
+<div class="panel">
+<canvas id="imageCanvas"></canvas>
+
+<label>
+<input type="checkbox" id="gridToggle">
+Show Grid
+</label>
+</div>
+
+<div class="panel">
+<canvas id="graphCanvas" width="460" height="320"></canvas>
+
+<div class="equation" id="equation"></div>
+<div class="warning" id="warning"></div>
+<div class="note">
+Note: Distortion here is applied in normalized image coordinates. Real camera distortion also depends on focal length and calibration parameters.
+</div>
+</div>
+</div>
+
+<div class="controls-wrap">
+<div id="controls"></div>
+</div>
+
+<div class="buttons">
+<button id="resetBtn">Reset</button>
+<button id="redrawBtn">Redraw</button>
+</div>
+
+<div class="buttons">
+<button onclick="presetIdentity()">Identity</button>
+<button onclick="presetExample1()">Example 1</button>
+<button onclick="presetExample2()">Example 2</button>
+<button onclick="presetFolding()">Folding</button>
+</div>
+
+<script>
+
+const imgCanvas=document.getElementById("imageCanvas");
+const imgCtx=imgCanvas.getContext("2d",{willReadFrequently:true});
+
+const graphCanvas=document.getElementById("graphCanvas");
+const gctx=graphCanvas.getContext("2d");
+
+const upload=document.getElementById("upload");
+const gridToggle=document.getElementById("gridToggle");
+
+const equationDiv=document.getElementById("equation");
+const warningDiv=document.getElementById("warning");
+const controlsDiv=document.getElementById("controls");
+
+const resetBtn=document.getElementById("resetBtn");
+const redrawBtn=document.getElementById("redrawBtn");
+
+const TERM_COUNT=4;
+
+const sliders=[];
+const powers=[];
+const sliderLabels=[];
+
+let loadedImg=new Image();
+let originalPixels=null;
+let imgLoaded=false;
+let redrawTimer=null;
+
+function buildControls(){
+
+for(let i=0;i<TERM_COUNT;i++){
+
+const row=document.createElement("div");
+row.className="control-row";
+
+const label=document.createElement("span");
+label.textContent="c"+(i+1);
+
+const slider=document.createElement("input");
+slider.type="range";
+slider.min="-2";
+slider.max="2";
+slider.step="0.01";
+slider.value="0";
+
+const rightBox=document.createElement("div");
+rightBox.style.display="flex";
+rightBox.style.gap="6px";
+rightBox.style.alignItems="center";
+
+const valueLabel=document.createElement("span");
+valueLabel.textContent="0.00";
+valueLabel.style.minWidth="38px";
+valueLabel.style.display="inline-block";
+valueLabel.style.textAlign="right";
+valueLabel.style.fontSize="13px";
+
+const select=document.createElement("select");
+
+for(let p=2;p<=12;p++){
+const opt=document.createElement("option");
+opt.value=p;
+opt.textContent="r^"+p;
+select.appendChild(opt);
+}
+
+select.value=String(i+2);
+
+rightBox.appendChild(valueLabel);
+rightBox.appendChild(select);
+
+row.appendChild(label);
+row.appendChild(slider);
+row.appendChild(rightBox);
+
+controlsDiv.appendChild(row);
+
+sliders.push(slider);
+powers.push(select);
+sliderLabels.push(valueLabel);
+
+slider.addEventListener("input",scheduleRender);
+slider.addEventListener("change",updateAll);
+select.addEventListener("change",updateAll);
+
+}
+}
+
+function updateSliderLabels(){
+for(let i=0;i<TERM_COUNT;i++)
+sliderLabels[i].textContent=parseFloat(sliders[i].value).toFixed(2);
+}
+
+function f(r){
+
+let sum=r;
+
+for(let i=0;i<TERM_COUNT;i++){
+
+const c=parseFloat(sliders[i].value);
+const p=parseInt(powers[i].value);
+
+sum+=c*Math.pow(r,p);
+
+}
+
+return sum;
+}
+
+function derivative(r){
+
+const eps=1e-4;
+
+return (f(r+eps)-f(r))/eps;
+
+}
+
+function updateEquation(){
+
+let eq="f(r) = r";
+
+for(let i=0;i<TERM_COUNT;i++){
+
+const c=parseFloat(sliders[i].value);
+const p=parseInt(powers[i].value);
+
+if(Math.abs(c)<1e-12) continue;
+
+const sign=c>=0?" + ":" - ";
+const mag=Math.abs(c).toFixed(2);
+
+eq+=sign+mag+" r^"+p;
+
+}
+
+equationDiv.textContent=eq;
+
+}
+
+function isMonotonic(){
+
+const N=300;
+
+for(let i=0;i<=N;i++){
+
+const r=i/N;
+
+if(derivative(r)<=0) return false;
+
+}
+
+return true;
+}
+
+function updateWarning(){
+
+if(isMonotonic()){
+
+warningDiv.style.color="lime";
+warningDiv.textContent="✔ Monotonic (invertible distortion)";
+
+}else{
+
+warningDiv.style.color="red";
+warningDiv.textContent="⚠ Non-invertible distortion";
+
+}
+
+}
+
+function drawGraph(){
+
+updateEquation();
+updateWarning();
+
+const w=graphCanvas.width;
+const h=graphCanvas.height;
+
+const left=52;
+const right=16;
+const top=16;
+const bottom=36;
+
+const pw=w-left-right;
+const ph=h-top-bottom;
+
+let yMin=0;
+let yMax=1;
+
+const N=400;
+
+for(let i=0;i<=N;i++){
+
+const r=i/N;
+const y=f(r);
+
+if(Number.isFinite(y)){
+yMin=Math.min(yMin,y);
+yMax=Math.max(yMax,y);
+}
+
+}
+
+if(Math.abs(yMax-yMin)<1e-9){
+yMax=yMin+1;
+}
+
+gctx.clearRect(0,0,w,h);
+
+gctx.fillStyle="#000";
+gctx.fillRect(0,0,w,h);
+
+gctx.strokeStyle="#2d2d2d";
+gctx.lineWidth=1;
+
+for(let i=0;i<=5;i++){
+
+const x=left+(i/5)*pw;
+
+gctx.beginPath();
+gctx.moveTo(x,top);
+gctx.lineTo(x,top+ph);
+gctx.stroke();
+
+}
+
+for(let i=0;i<=5;i++){
+
+const y=top+(i/5)*ph;
+
+gctx.beginPath();
+gctx.moveTo(left,y);
+gctx.lineTo(left+pw,y);
+gctx.stroke();
+
+}
+
+const mapX=r=>left+r*pw;
+const mapY=y=>top+ph-((y-yMin)/(yMax-yMin))*ph;
+
+gctx.strokeStyle="cyan";
+gctx.lineWidth=2;
+
+gctx.beginPath();
+
+for(let i=0;i<=N;i++){
+
+const r=i/N;
+const y=f(r);
+
+const px=mapX(r);
+const py=mapY(y);
+
+if(i===0) gctx.moveTo(px,py);
+else gctx.lineTo(px,py);
+
+}
+
+gctx.stroke();
+
+}
+
+function drawGridOnImage(){
+
+const spacing=50;
+
+imgCtx.strokeStyle="rgba(0,255,0,0.45)";
+imgCtx.lineWidth=1;
+
+for(let x=0;x<imgCanvas.width;x+=spacing){
+
+imgCtx.beginPath();
+imgCtx.moveTo(x,0);
+imgCtx.lineTo(x,imgCanvas.height);
+imgCtx.stroke();
+
+}
+
+for(let y=0;y<imgCanvas.height;y+=spacing){
+
+imgCtx.beginPath();
+imgCtx.moveTo(0,y);
+imgCtx.lineTo(imgCanvas.width,y);
+imgCtx.stroke();
+
+}
+
+}
+
+function forwardRender(){
+
+if(!imgLoaded||!originalPixels) return;
+
+const width=imgCanvas.width;
+const height=imgCanvas.height;
+
+const src=originalPixels.data;
+
+const accum=new Float32Array(width*height*4);
+const weights=new Float32Array(width*height);
+
+const cx=width/2;
+const cy=height/2;
+
+const scale=Math.max(cx,cy);
+
+for(let ys=0;ys<height;ys++)
+for(let xs=0;xs<width;xs++){
+
+const nx=(xs-cx)/scale;
+const ny=(ys-cy)/scale;
+
+const r=Math.sqrt(nx*nx+ny*ny);
+const rd=f(r);
+
+let factor;
+
+if(r<1e-12){
+factor=1;
+}else{
+factor=rd/r;
+}
+
+const xd=nx*factor;
+const yd=ny*factor;
+
+const px=xd*scale+cx;
+const py=yd*scale+cy;
+
+const x0=Math.floor(px);
+const y0=Math.floor(py);
+
+const dx=px-x0;
+const dy=py-y0;
+
+const w00=(1-dx)*(1-dy);
+const w10=dx*(1-dy);
+const w01=(1-dx)*dy;
+const w11=dx*dy;
+
+const si=(ys*width+xs)*4;
+
+function splat(x,y,w){
+
+if(x<0||x>=width||y<0||y>=height) return;
+
+const idx=y*width+x;
+const di=idx*4;
+
+accum[di]+=w*src[si];
+accum[di+1]+=w*src[si+1];
+accum[di+2]+=w*src[si+2];
+accum[di+3]+=255*w;
+
+weights[idx]+=w;
+
+}
+
+splat(x0,y0,w00);
+splat(x0+1,y0,w10);
+splat(x0,y0+1,w01);
+splat(x0+1,y0+1,w11);
+
+}
+
+const img=imgCtx.createImageData(width,height);
+
+for(let i=0;i<width*height;i++){
+
+const di=i*4;
+const wsum=weights[i];
+
+if(wsum>1e-8){
+
+img.data[di]=Math.min(255,accum[di]/wsum);
+img.data[di+1]=Math.min(255,accum[di+1]/wsum);
+img.data[di+2]=Math.min(255,accum[di+2]/wsum);
+img.data[di+3]=255;
+
+}else{
+
+img.data[di]=0;
+img.data[di+1]=0;
+img.data[di+2]=0;
+img.data[di+3]=255;
+
+}
+
+}
+
+imgCtx.putImageData(img,0,0);
+
+if(gridToggle.checked) drawGridOnImage();
+
+}
+
+function updateAll(){
+
+updateSliderLabels();
+drawGraph();
+forwardRender();
+
+}
+
+function scheduleRender(){
+
+updateSliderLabels();
+drawGraph();
+
+clearTimeout(redrawTimer);
+
+redrawTimer=setTimeout(()=>{
+
+forwardRender();
+
+},90);
+
+}
+
+function resetAll(){
+
+for(let i=0;i<TERM_COUNT;i++){
+
+sliders[i].value="0";
+powers[i].value=String(i+2);
+
+}
+
+updateAll();
+
+}
+
+function presetIdentity(){
+resetAll();
+}
+
+function presetExample1(){
+
+resetAll();
+
+sliders[0].value="-0.35";
+powers[0].value="3";
+
+sliders[1].value="0.15";
+powers[1].value="5";
+
+updateAll();
+}
+
+function presetExample2(){
+
+resetAll();
+
+sliders[0].value="0.35";
+powers[0].value="3";
+
+sliders[1].value="-0.15";
+powers[1].value="5";
+
+updateAll();
+}
+
+function presetFolding(){
+
+resetAll();
+
+sliders[0].value="1.2";
+powers[0].value="3";
+
+sliders[1].value="-1.0";
+powers[1].value="5";
+
+updateAll();
+}
+
+upload.addEventListener("change",function(e){
+
+const file=e.target.files[0];
+if(!file) return;
+
+const reader=new FileReader();
+
+reader.onload=function(ev){
+
+loadedImg.onload=function(){
+
+const maxW=760;
+const maxH=580;
+
+const scale=Math.min(maxW/loadedImg.width,maxH/loadedImg.height,1);
+
+imgCanvas.width=Math.round(loadedImg.width*scale);
+imgCanvas.height=Math.round(loadedImg.height*scale);
+
+imgCtx.drawImage(loadedImg,0,0,imgCanvas.width,imgCanvas.height);
+
+originalPixels=imgCtx.getImageData(0,0,imgCanvas.width,imgCanvas.height);
+
+imgLoaded=true;
+
+updateAll();
+
+};
+
+loadedImg.src=ev.target.result;
+
+};
+
+reader.readAsDataURL(file);
+
+});
+
+gridToggle.addEventListener("change",updateAll);
+resetBtn.addEventListener("click",resetAll);
+redrawBtn.addEventListener("click",updateAll);
+
+buildControls();
+updateSliderLabels();
+drawGraph();
+updateEquation();
+updateWarning();
+
+</script>
+
+</body>
+</html>
