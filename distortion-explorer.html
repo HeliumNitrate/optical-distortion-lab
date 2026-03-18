@@ -290,7 +290,7 @@ select.addEventListener("change",updateAll);
 
 }
 
-/* DISTORTION FUNCTION */
+/* DISTORTION FUNCTION  f(r): undistorted → distorted */
 
 function f(r){
 
@@ -389,82 +389,88 @@ gctx.stroke();
 
 }
 
-/* FORWARD DISTORTION */
+/* ============================================================
+   FORWARD BILINEAR SPLATTING
+   - Each source pixel is mapped forward to its destination
+   - Color is distributed to the 4 surrounding destination pixels
+     with bilinear weights → no holes, no lines
+   - Folding IS visible: multiple sources collide at same dest
+   ============================================================ */
 
 function forwardRender(){
 
 if(!imgLoaded) return;
 
-const width=imgCanvas.width;
-const height=imgCanvas.height;
+const width  = imgCanvas.width;
+const height = imgCanvas.height;
+const cx = width  / 2;
+const cy = height / 2;
+const scale = Math.max(cx, cy);
 
-const src=originalPixels.data;
+const src = originalPixels.data;
 
-const accum=new Float32Array(width*height*4);
-const weights=new Float32Array(width*height);
+/* accumulation buffers */
+const accR = new Float32Array(width * height);
+const accG = new Float32Array(width * height);
+const accB = new Float32Array(width * height);
+const accW = new Float32Array(width * height);
 
-const cx=width/2;
-const cy=height/2;
-const scale=Math.max(cx,cy);
+for(let ys = 0; ys < height; ys++){
+for(let xs = 0; xs < width;  xs++){
 
-for(let ys=0;ys<height;ys++)
-for(let xs=0;xs<width;xs++){
+  const nx = (xs - cx) / scale;
+  const ny = (ys - cy) / scale;
+  const r  = Math.sqrt(nx*nx + ny*ny);
+  const rd = f(r);
 
-const nx=(xs-cx)/scale;
-const ny=(ys-cy)/scale;
+  const factor = r < 1e-12 ? 1 : rd / r;
 
-const r=Math.sqrt(nx*nx+ny*ny);
-const rd=f(r);
+  /* destination (float) */
+  const xd = nx * factor * scale + cx;
+  const yd = ny * factor * scale + cy;
 
-let factor=r<1e-12?1:rd/r;
+  /* integer corners */
+  const x0 = Math.floor(xd);
+  const y0 = Math.floor(yd);
+  const tx  = xd - x0;
+  const ty  = yd - y0;
 
-const xd=nx*factor;
-const yd=ny*factor;
+  const si = (ys * width + xs) * 4;
+  const rv = src[si], gv = src[si+1], bv = src[si+2];
 
-const px=xd*scale+cx;
-const py=yd*scale+cy;
+  /* splat to 4 neighbours with bilinear weights */
+  function splat(xi, yi, w){
+    if(xi < 0 || xi >= width || yi < 0 || yi >= height) return;
+    const idx = yi * width + xi;
+    accR[idx] += rv * w;
+    accG[idx] += gv * w;
+    accB[idx] += bv * w;
+    accW[idx] += w;
+  }
 
-const x0=Math.floor(px);
-const y0=Math.floor(py);
+  splat(x0,   y0,   (1-tx)*(1-ty));
+  splat(x0+1, y0,      tx *(1-ty));
+  splat(x0,   y0+1, (1-tx)*   ty );
+  splat(x0+1, y0+1,    tx *   ty );
 
-const si=(ys*width+xs)*4;
+}}
 
-function splat(x,y){
+/* compose output */
+const out = imgCtx.createImageData(width, height);
+const od  = out.data;
 
-if(x<0||x>=width||y<0||y>=height) return;
-
-const idx=(y*width+x)*4;
-
-accum[idx]+=src[si];
-accum[idx+1]+=src[si+1];
-accum[idx+2]+=src[si+2];
-weights[y*width+x]+=1;
-
+for(let i = 0; i < width * height; i++){
+  const w = accW[i];
+  const di = i * 4;
+  if(w > 0){
+    od[di  ] = accR[i] / w;
+    od[di+1] = accG[i] / w;
+    od[di+2] = accB[i] / w;
+    od[di+3] = 255;
+  }
 }
 
-splat(x0,y0);
-
-}
-
-const img=imgCtx.createImageData(width,height);
-
-for(let i=0;i<width*height;i++){
-
-const w=weights[i];
-const di=i*4;
-
-if(w>0){
-
-img.data[di]=accum[di]/w;
-img.data[di+1]=accum[di+1]/w;
-img.data[di+2]=accum[di+2]/w;
-img.data[di+3]=255;
-
-}
-
-}
-
-imgCtx.putImageData(img,0,0);
+imgCtx.putImageData(out, 0, 0);
 
 }
 
