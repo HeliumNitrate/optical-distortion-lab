@@ -52,6 +52,7 @@ nav {
   z-index: 100;
 }
 
+/* LOGO */
 nav .logo {
   display: flex;
   flex-direction: column;
@@ -108,6 +109,7 @@ nav a { margin-left: 24px; font-size: 0.95rem; }
   position: relative;
 }
 
+/* IMAGE + HOVER OVERLAY */
 .image-link {
   position: relative;
   display: block;
@@ -142,6 +144,7 @@ nav a { margin-left: 24px; font-size: 0.95rem; }
   opacity: 1;
 }
 
+/* BADGES */
 .badge {
   position: absolute;
   top: 14px;
@@ -151,6 +154,7 @@ nav a { margin-left: 24px; font-size: 0.95rem; }
   border-radius: 20px;
   letter-spacing: 0.05em;
   font-weight: 500;
+  backdrop-filter: blur(6px);
 }
 
 .badge.mono {
@@ -187,94 +191,337 @@ footer {
   </div>
 </nav>
 
+<!-- HERO -->
 <section class="hero">
-
-<h1>Optical Distortion & Undistortion Toolbox</h1>
-
-<p>
-A commercial <strong>MATLAB distortion engine</strong> designed for<br>
-forward distortion modeling, physical validity control,<br>
-and safe inverse undistortion.
-</p>
-
-<div class="buttons">
-<a href="#toolbox" class="btn-primary">Explore Toolbox</a>
-<a href="distortion-explorer.html" class="btn-secondary">Distortion Function Explorer</a>
-<a href="#contact" class="btn-secondary">Contact</a>
-</div>
-
+  <h1>Optical Distortion & Undistortion Toolbox</h1>
+  <p>
+    A commercial <strong>MATLAB distortion engine</strong> designed for<br>
+    forward distortion modeling, physical validity control,<br>
+    and safe inverse undistortion.
+  </p>
+  <div class="buttons">
+    <a href="#toolbox" class="btn-primary">Explore Toolbox</a>
+    <a href="distortion-explorer.html" class="btn-secondary">Distortion Function Explorer</a>
+    <a href="#contact" class="btn-secondary">Contact</a>
+  </div>
 </section>
 
+<!-- TOOLBOX -->
 <section id="toolbox">
+  <h2>Distortion & Undistortion Toolbox (MATLAB)</h2>
+  <p>
+    A flexible and high-accuracy framework for modeling,
+    applying and inverting optical distortion.
+  </p>
+  <p style="margin-top:24px; max-width:800px;">
+    Unlike conventional calibration libraries, Optical Distortion Lab
+    is built around a <strong>forward-first distortion philosophy</strong>.
+    Distortion is explicitly defined, analyzed, and validated
+    <em>before</em> inverse mapping is applied.
+  </p>
+  <div class="features">
+    <div class="feature">
+      <h3>Unlimited Polynomial Models</h3>
+      <p>
+        No predefined limit on polynomial degree or number of terms.
+        Models are constrained only by mathematics and physical validity.
+      </p>
+    </div>
+    <div class="feature">
+      <h3>Monotonicity & Physical Validity</h3>
+      <p>
+        Automatic detection of non-monotonic mappings, folding,
+        and irreversible information loss.
+      </p>      
+    </div>
+    <div class="feature">
+      <h3>Robust Inverse Mapping</h3>
+      <p>LUT-based inverse mapping with stable interpolation.</p>
+    </div>
+    <div class="feature">
+      <h3>Production Ready</h3>
+      <p>Script-based batch processing, distributed as .mltbx.</p>
+    </div>
+    <div class="feature">
+      <h3>Custom Sampling Control</h3>
+      <p>Balance accuracy, performance and output resolution.</p>
+    </div>
+  </div>
+</section>
 
-<h2>Distortion & Undistortion Toolbox (MATLAB)</h2>
+<!-- VISUAL EVIDENCE -->
+<section>
+  <h2>Visual Evidence: Monotonic vs Non-Monotonic Distortion</h2>
 
-<p>
-A flexible and high-accuracy framework for modeling,
-applying and inverting optical distortion.
-</p>
+  <h3 style="margin-top:60px;">Monotonic Distortion Model</h3>
+  <div class="features">
+    <div class="feature">
+      <h4>Distorted</h4>
+      <a class="image-link" href="assets/images/mono_distorted.png" target="_blank">
+        <img src="assets/images/mono_distorted.png" alt="Monotonic distorted">
+      </a>
+    </div>
 
-<p style="margin-top:24px;">
-Unlike conventional calibration libraries,
-Optical Distortion Lab is built around a
-<strong>forward-first distortion philosophy</strong>.
-</p>
+    <div class="feature">
+      <h4>Undistorted</h4>
+      <a class="image-link" href="assets/images/mono_undistorted.png" target="_blank">
+        <img src="assets/images/mono_undistorted.png" alt="Monotonic undistorted">
+      </a>
+    </div>
 
-<div class="features">
+    <div class="feature">
+      <span class="badge mono">Monotonic</span>
+      <h4>Radial Mapping</h4>
+      <a class="image-link"
+         href="assets/images/mono_graph.png"
+         target="_blank"
+         data-overlay="Monotonic mapping · Invertible over full field (normalized radial coordinate)">
+        <img src="assets/images/mono_graph.png" alt="Monotonic radial mapping">
+      </a>
+    </div>
+  </div>
 
-<div class="feature">
-<h3>Unlimited Polynomial Models</h3>
-<p>No predefined limit on polynomial degree or number of terms.</p>
-</div>
+  <h3 style="margin-top:80px;">Non-Monotonic Distortion Model</h3>
+  <div class="features">
+    <div class="feature">
+      <h4>Distorted</h4>
+      <a class="image-link" href="assets/images/nonmono_distorted.png" target="_blank">
+        <img src="assets/images/nonmono_distorted.png" alt="Non-monotonic distorted">
+      </a>
+    </div>
 
-<div class="feature">
-<h3>Monotonicity & Physical Validity</h3>
-<p>Automatic detection of non-monotonic mappings and folding.</p>
-</div>
+    <div class="feature">
+      <h4>Undistorted</h4>
+      <a class="image-link" href="assets/images/nonmono_undistorted.png" target="_blank">
+        <img src="assets/images/nonmono_undistorted.png" alt="Non-monotonic undistorted">
+      </a>
+    </div>
 
-<div class="feature">
-<h3>Robust Inverse Mapping</h3>
-<p>LUT-based inverse mapping with stable interpolation.</p>
-</div>
+    <div class="feature">
+      <span class="badge nonmono">Non-Monotonic</span>
+      <h4>Radial Mapping</h4>
+      <a class="image-link"
+         href="assets/images/nonmono_graph.png"
+         target="_blank"
+         data-overlay="Δk = −0.05 · r¹¹ → non-monotonic mapping · information loss">
+        <img src="assets/images/nonmono_graph.png" alt="Non-monotonic radial mapping">
+      </a>
+    </div>
+  </div>
 
-<div class="feature">
-<h3>Production Ready</h3>
-<p>Script-based batch processing distributed as MATLAB toolbox.</p>
-</div>
+  <p style="margin-top:40px; max-width:800px;">
+    <strong>Technical note:</strong>
+    The two distortion models differ by a single higher-order term
+    of <code>-0.05 · r<sup>11</sup></code>.
+    This term has negligible influence near the image center,
+    but dominates toward the outer field, causing a transition
+    from monotonic to non-monotonic radial mapping.
+  </p>
+</section>
 
-</div>
+<!-- WHAT THIS TOOLBOX IS NOT -->
+<section>
+  <h2>What This Toolbox Is Not</h2>
+
+  <div class="features">
+    <div class="feature">
+      <h3>No Parameter Estimation (Yet)</h3>
+      <p>
+        The toolbox does not currently estimate distortion parameters
+        from images or calibration patterns.
+      </p>
+    </div>
+
+    <div class="feature">
+      <h3>Not a Black Box</h3>
+      <p>
+        All distortion models are explicitly defined and inspectable.
+        There are no hidden assumptions or locked equations.
+      </p>
+    </div>
+  </div>
+
+  <p style="margin-top:32px; max-width:800px;">
+    This is a <strong>deliberate design choice</strong>.
+    Reliable estimation requires a well-defined and physically valid
+    forward model — not the other way around.
+  </p>
+  <p style="margin-top:16px; max-width:800px;">
+    The focus is on forward modeling and physical correctness,
+    which form the foundation for any future estimation capability.
+  </p>
 
 </section>
 
-<section id="contact">
+<!-- WHY NOT OPENCV -->
+<section>
+  <h2>Why Not OpenCV or Standard Calibration Tools?</h2>
 
-<h2>Contact</h2>
+  <p style="max-width:800px;">
+    OpenCV and similar libraries are excellent for
+    <strong>parameter estimation and camera calibration</strong>.
+    However, they are fundamentally designed around
+    <em>inverse correction</em>, not forward distortion modeling.
+  </p>
 
-<p>
-📧
-<a href="mailto:ahmet.basaran@opticaldistortionlab.com">
-ahmet.basaran@opticaldistortionlab.com
-</a>
-</p>
+  <div class="features">
+    <div class="feature">
+      <h3>Low-Order Model Assumptions</h3>
+      <p>
+        Most calibration tools rely on predefined,
+        low-order distortion models that implicitly assume
+        smooth and monotonic behavior.
+      </p>
+    </div>
 
-<p style="margin-top:10px;">
-ORCID:
-<a href="https://orcid.org/0009-0008-2682-0572">
-0009-0008-2682-0572
-</a>
-</p>
+    <div class="feature">
+      <h3>No Physical Validity Check</h3>
+      <p>
+        Non-monotonic mappings, folding, and information loss
+        are usually not detected or reported explicitly.
+      </p>
+    </div>
 
-<p style="margin-top:10px;">
-GitHub:
-<a href="https://github.com/HeliumNitrate">
-HeliumNitrate
-</a>
-</p>
+    <div class="feature">
+      <h3>Inverse-Only Perspective</h3>
+      <p>
+        The forward distortion function is rarely treated
+        as a first-class, inspectable object.
+      </p>
+    </div>
+  </div>
 
+  <p style="margin-top:32px; max-width:800px;">
+    Optical Distortion Lab addresses these limitations by
+    treating <strong>forward distortion as the primary problem</strong>,
+    enforcing physical constraints, and allowing
+    unrestricted model complexity when required.
+  </p>
+</section>
+
+<!-- FUTURE WORKS -->
+<section>
+  <h2>Roadmap & Future Work</h2>
+
+  <div class="features">
+    <div class="feature">
+      <h3>Distortion Estimation</h3>
+      <p>
+        Parameter estimation modules built on top of
+        the existing forward distortion engine.
+      </p>
+    </div>
+
+    <div class="feature">
+      <h3>Python Implementation</h3>
+      <p>
+        A Python version targeting machine learning
+        and large-scale dataset generation.
+      </p>
+    </div>
+
+    <div class="feature">
+      <h3>Differential Calibration</h3>
+      <p>
+        Physically constrained differential calibration
+        methods for advanced optical systems.
+      </p>
+    </div>
+  </div>
+</section>
+
+<!-- LICENSING -->
+<section>
+  <h2>Licensing & Availability</h2>
+
+  <p style="max-width:800px;">
+    Optical Distortion Lab is distributed as a
+    <strong>commercial MATLAB toolbox</strong>,
+    intended for research, development, and industrial use.
+  </p>
+
+  <div class="features">
+    <div class="feature">
+      <h3>Research & Academic License</h3>
+      <p>
+        Suitable for universities, research groups,
+        and individual researchers.
+      </p>
+    </div>
+
+    <div class="feature">
+      <h3>Commercial License</h3>
+      <p>
+        For industrial applications, product development,
+        and internal tooling.
+      </p>
+    </div>
+
+    <div class="feature">
+      <h3>Evaluation Access</h3>
+      <p>
+        Limited evaluation versions may be provided
+        upon request.
+      </p>
+    </div>
+  </div>
+
+  <div style="margin-top:40px;">
+    <a href="mailto:ahmet.basaran@opticaldistortionlab.com"
+       class="btn-primary"
+       style="display:inline-block; padding:16px 36px; border-radius:32px;">
+      Request Licensing Information
+    </a>
+  </div>
+</section>
+
+<!-- CONTACT -->
+<section id="contact">  
+  <h2>Contact & Research Identity</h2>
+  <p>
+    📧 <a href="mailto:ahmet.basaran@opticaldistortionlab.com">
+      ahmet.basaran@opticaldistortionlab.com
+    </a>
+  </p>
+
+  <p style="margin-top:12px;">
+    🧪 ORCID:
+    <a href="https://orcid.org/0009-0008-2682-0572"
+       target="_blank" rel="noopener">
+      0009-0008-2682-0572
+    </a>
+  </p>
+
+  <p style="margin-top:12px;">
+    💼 LinkedIn:
+    <a href="https://www.linkedin.com/in/ahmet-ba%C5%9Faran-x"
+       target="_blank" rel="noopener">
+      Ahmet Başaran
+    </a>
+  </p>
+
+  <p style="margin-top:12px;">
+    💻 GitHub:
+    <a href="https://github.com/HeliumNitrate"
+       target="_blank" rel="noopener">
+      HeliumNitrate
+    </a>
+  </p>
+</section>
+
+<!-- FINAL WORD -->
+<section>
+  <p style="max-width:800px; font-size:1.05rem; color:#ddd;">
+    <strong>
+      Optical Distortion Lab is a forward-first,
+      physically constrained distortion engine —
+      not just an undistortion tool.
+    </strong>
+  </p>
 </section>
 
 <footer>
-© 2025 OpticalDistortionLab
+  © 2025 OpticalDistortionLab
 </footer>
 
 </body>
