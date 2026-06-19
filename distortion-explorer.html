@@ -32,14 +32,30 @@ border-bottom:1px solid #222;
 z-index:100;
 }
 
+.logo-link{
+display:flex;
+flex-direction:column;
+align-items:flex-start;
+gap:2px;
+text-decoration:none;
+}
+
 .logo-link img{
-height:48px;
+height:72px;
 opacity:0.9;
 transition:opacity .2s;
+display:block;
+margin-bottom:-20px;
 }
 
 .logo-link img:hover{
 opacity:1;
+}
+
+.logo-link .slogan{
+font-size:0.75rem;
+color:#9a9aa1;
+letter-spacing:0.08em;
 }
 
 .nav-links a{
@@ -152,6 +168,7 @@ color:#eee;
 
 <a href="index.html" class="logo-link">
 <img src="assets/images/logo.png" alt="OpticalDistortionLab logo">
+<span class="slogan">Distortion is not an error</span>
 </a>
 
 <div class="nav-links">
