@@ -452,82 +452,6 @@ required degrees and terms to reproduce the radial mapping across the covered fi
 
 <hr class="section-divider">
 
-<!-- ═══ WHY IT WORKS ══════════════════════════════════════════════════ -->
-<section id="differentiators">
-
-<h2>Why The Recovery Is Different</h2>
-<p>
-Four design choices distinguish the engine from standard calibration and
-undistortion workflows.
-</p>
-
-<div class="diff-grid">
-
-  <div class="diff-card d1">
-    <div class="diff-num">01 — Free Function Model</div>
-    <h3>Arbitrary Degree, Terms &amp; Bases</h3>
-    <p>
-      Polynomial degree and term count are fully user-defined — odd, even,
-      sparse, and mixed-degree terms. The same selection machinery extends to
-      non-polynomial local bases (Gaussian zonal terms, sigmoid knees),
-      representing real lens profiles that fixed global families cannot.
-    </p>
-    <div class="diff-vs">
-      <strong>Standard tools</strong> commonly use fixed distortion families
-      and limited radial coefficient structures. See the
-      <a href="#freedom">Function Freedom</a> evidence below.
-    </div>
-  </div>
-
-  <div class="diff-card d2">
-    <div class="diff-num">02 — Deterministic Calibration</div>
-    <h3>Linear Least-Squares, Not Iterative Optimisation</h3>
-    <p>
-      Estimation is a direct linear solve for the distortion constants.
-      No Levenberg–Marquardt loop, no gradient descent, no local minima.
-    </p>
-    <div class="diff-vs">
-      <strong>Standard tools</strong> typically minimize reprojection error
-      through iterative optimisation.
-    </div>
-  </div>
-
-  <div class="diff-card d3">
-    <div class="diff-num">03 — Deterministic Inverse</div>
-    <h3>Deterministic Inverse Mapping</h3>
-    <p>
-      The inverse is computed once and applied directly to every pixel —
-      no per-pixel iterative solver and no convergence loop.
-    </p>
-    <div class="diff-vs">
-      <strong>Standard inverse workflows</strong> often rely on iterative
-      coordinate inversion.
-    </div>
-  </div>
-
-  <div class="diff-card d1">
-    <div class="diff-num">04 — Physical Validity Control</div>
-    <h3>Invertible by Construction</h3>
-    <p>
-      The estimator is monotonicity-constrained: it never returns a non-monotonic
-      (folding) model, so every recovered mapping is invertible and undistortion
-      never silently fabricates content. When a model is supplied externally, the
-      engine evaluates it for folding and quantifies irreversible (hard) vs.
-      recoverable (soft) loss before inversion.
-    </p>
-    <div class="diff-vs">
-      <strong>Standard tools</strong> fit by reprojection error with no
-      monotonicity guard — an over-fitted or extrapolated model can fold, and they
-      do not report whether the mapping stays invertible over the field.
-    </div>
-  </div>
-
-</div>
-
-</section>
-
-<hr class="section-divider">
-
 <!-- ═══ FUNCTION FREEDOM ══════════════════════════════════════════════ -->
 <section id="freedom">
 
@@ -602,6 +526,82 @@ undistortion workflows.
     error. The engine checks monotonicity, undistorts the valid region, and flags
     the folded band as hard loss instead of fabricating pixels.</p>
   </div>
+</div>
+
+</section>
+
+<hr class="section-divider">
+
+<!-- ═══ WHY IT WORKS ══════════════════════════════════════════════════ -->
+<section id="differentiators">
+
+<h2>Why The Recovery Is Different</h2>
+<p>
+Four design choices distinguish the engine from standard calibration and
+undistortion workflows.
+</p>
+
+<div class="diff-grid">
+
+  <div class="diff-card d1">
+    <div class="diff-num">01 — Free Function Model</div>
+    <h3>Arbitrary Degree, Terms &amp; Bases</h3>
+    <p>
+      Polynomial degree and term count are fully user-defined — odd, even,
+      sparse, and mixed-degree terms. The same selection machinery extends to
+      non-polynomial local bases (Gaussian zonal terms, sigmoid knees),
+      representing real lens profiles that fixed global families cannot.
+    </p>
+    <div class="diff-vs">
+      <strong>Standard tools</strong> commonly use fixed distortion families
+      and limited radial coefficient structures. See the
+      <a href="#freedom">Function Freedom</a> evidence above.
+    </div>
+  </div>
+
+  <div class="diff-card d2">
+    <div class="diff-num">02 — Deterministic Calibration</div>
+    <h3>Linear Least-Squares, Not Iterative Optimisation</h3>
+    <p>
+      Estimation is a direct linear solve for the distortion constants.
+      No Levenberg–Marquardt loop, no gradient descent, no local minima.
+    </p>
+    <div class="diff-vs">
+      <strong>Standard tools</strong> typically minimize reprojection error
+      through iterative optimisation.
+    </div>
+  </div>
+
+  <div class="diff-card d3">
+    <div class="diff-num">03 — Deterministic Inverse</div>
+    <h3>Deterministic Inverse Mapping</h3>
+    <p>
+      The inverse is computed once and applied directly to every pixel —
+      no per-pixel iterative solver and no convergence loop.
+    </p>
+    <div class="diff-vs">
+      <strong>Standard inverse workflows</strong> often rely on iterative
+      coordinate inversion.
+    </div>
+  </div>
+
+  <div class="diff-card d1">
+    <div class="diff-num">04 — Physical Validity Control</div>
+    <h3>Invertible by Construction</h3>
+    <p>
+      The estimator is monotonicity-constrained: it never returns a non-monotonic
+      (folding) model, so every recovered mapping is invertible and undistortion
+      never silently fabricates content. When a model is supplied externally, the
+      engine evaluates it for folding and quantifies irreversible (hard) vs.
+      recoverable (soft) loss before inversion.
+    </p>
+    <div class="diff-vs">
+      <strong>Standard tools</strong> fit by reprojection error with no
+      monotonicity guard — an over-fitted or extrapolated model can fold, and they
+      do not report whether the mapping stays invertible over the field.
+    </div>
+  </div>
+
 </div>
 
 </section>
