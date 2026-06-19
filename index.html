@@ -3,7 +3,30 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-<title>Optical Distortion Lab</title>
+<title>Optical Distortion Lab — Numerically Exact Distortion Estimation &amp; Undistortion</title>
+
+<!-- ── SEO ── -->
+<meta name="description" content="Optical Distortion Lab: numerically exact radial distortion estimation and undistortion, validated against known ground-truth fields. Free-function modeling, deterministic linear calibration, and monotonicity-constrained (invertible-by-construction) inversion. Available as MATLAB and Python packages." />
+<meta name="author" content="Ahmet Başaran" />
+<meta name="theme-color" content="#0b0b0d" />
+<link rel="canonical" href="https://opticaldistortionlab.com/" />
+<link rel="icon" type="image/png" href="assets/images/logo.png" />
+<link rel="apple-touch-icon" href="assets/images/logo.png" />
+
+<!-- ── Open Graph ── -->
+<meta property="og:type" content="website" />
+<meta property="og:site_name" content="Optical Distortion Lab" />
+<meta property="og:title" content="Optical Distortion Lab — Numerically Exact Distortion Estimation &amp; Undistortion" />
+<meta property="og:description" content="Free-function radial distortion estimation and undistortion, validated against known ground truth. Deterministic linear calibration, monotonicity-constrained inversion. MATLAB &amp; Python." />
+<meta property="og:url" content="https://opticaldistortionlab.com/" />
+<meta property="og:image" content="https://opticaldistortionlab.com/assets/images/estimation_graph.png" />
+<meta property="og:image:alt" content="Ground truth vs estimated radial distortion function with coefficient table" />
+
+<!-- ── Twitter Card ── -->
+<meta name="twitter:card" content="summary_large_image" />
+<meta name="twitter:title" content="Optical Distortion Lab — Numerically Exact Distortion Estimation &amp; Undistortion" />
+<meta name="twitter:description" content="Free-function radial distortion estimation and undistortion, validated against known ground truth. Deterministic, monotonicity-constrained. MATLAB &amp; Python." />
+<meta name="twitter:image" content="https://opticaldistortionlab.com/assets/images/estimation_graph.png" />
 
 <style>
 * {
@@ -50,7 +73,36 @@ nav {
 nav .logo { display: flex; flex-direction: column; align-items: flex-start; gap: 2px; font-weight: 600; }
 nav .logo img { height: 72px; display: block; margin-bottom: -20px; }
 nav .slogan { font-size: 0.75rem; color: var(--muted); letter-spacing: 0.08em; }
-nav a { margin-left: 24px; font-size: 0.95rem; }
+nav .nav-links a { margin-left: 24px; font-size: 0.95rem; }
+
+/* ── MOBILE NAV TOGGLE ── */
+.nav-toggle {
+  display: none;
+  background: none; border: none; cursor: pointer;
+  width: 40px; height: 40px; padding: 8px;
+  flex-direction: column; justify-content: center; gap: 5px;
+}
+.nav-toggle span {
+  display: block; height: 2px; width: 100%;
+  background: var(--fg); border-radius: 2px;
+  transition: transform 0.25s ease, opacity 0.25s ease;
+}
+nav.open .nav-toggle span:nth-child(1) { transform: translateY(7px) rotate(45deg); }
+nav.open .nav-toggle span:nth-child(2) { opacity: 0; }
+nav.open .nav-toggle span:nth-child(3) { transform: translateY(-7px) rotate(-45deg); }
+
+@media (max-width: 720px) {
+  nav { flex-wrap: wrap; }
+  .nav-toggle { display: flex; }
+  .nav-links {
+    flex-basis: 100%;
+    display: none;
+    flex-direction: column;
+    padding-top: 16px;
+  }
+  nav.open .nav-links { display: flex; }
+  .nav-links a { margin-left: 0; padding: 12px 0; font-size: 1.05rem; border-top: 1px solid rgba(255,255,255,0.06); }
+}
 
 /* ── HERO ── */
 .hero { min-height: 100vh; display: flex; flex-direction: column; justify-content: center; }
@@ -210,7 +262,10 @@ footer { text-align: center; padding: 40px 10%; color: var(--muted); font-size: 
     <img src="assets/images/logo.png" alt="OpticalDistortionLab logo">
     <div class="slogan">Distortion is not an error</div>
   </div>
-  <div>
+  <button class="nav-toggle" aria-label="Toggle navigation" aria-expanded="false">
+    <span></span><span></span><span></span>
+  </button>
+  <div class="nav-links">
     <a href="#estimation">Estimation</a>
     <a href="#undistortion">Undistortion</a>
     <a href="#freedom">Function Freedom</a>
@@ -218,6 +273,24 @@ footer { text-align: center; padding: 40px 10%; color: var(--muted); font-size: 
     <a href="#contact">Contact</a>
   </div>
 </nav>
+
+<script>
+  (function () {
+    var nav = document.querySelector('nav');
+    var toggle = nav.querySelector('.nav-toggle');
+    toggle.addEventListener('click', function () {
+      var open = nav.classList.toggle('open');
+      toggle.setAttribute('aria-expanded', open ? 'true' : 'false');
+    });
+    // Close the menu after tapping a link on mobile
+    nav.querySelectorAll('.nav-links a').forEach(function (a) {
+      a.addEventListener('click', function () {
+        nav.classList.remove('open');
+        toggle.setAttribute('aria-expanded', 'false');
+      });
+    });
+  })();
+</script>
 
 <!-- ═══ HERO ═══════════════════════════════════════════════════════════ -->
 <section class="hero">
